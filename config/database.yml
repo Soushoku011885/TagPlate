@@ -18,7 +18,7 @@ default: &default
   adapter: postgresql
   encording: SJIS 
   database: postgres
-  pool: 5
+  pool: 10
   username: postgres
   password: snake
   host: localhost
