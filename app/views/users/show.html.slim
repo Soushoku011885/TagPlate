@@ -1,0 +1,31 @@
+- content_for(:title, "TagPlate ログイン")
+div#app
+  div#loginmain
+    div#logowrapper
+      div#titlelogo TagPlate
+    div#wrapper
+      div#filltop
+      div#loginsection
+        div#inputlogin
+          h1.algin1.fsize30 ログイン
+          = form_for(:session,url:login_path) do |f| 
+            = f.label :name, 'ユーザ名' 
+            = f.text_field :name 
+            = f.label :password_digest, 'パスワード' 
+            = f.password_field :password_digest
+            = f.submit 'ログイン'
+          end
+          div#questionlogin.algin1.fsize14　ユーザー登録画面を表示
+
+        div#inputcreate.nonactive
+          h1.mainfcol01.algin1.fsize30 ユーザ登録
+          = form_for(@User) do |f| 
+            = f.label :name, 'ユーザ名' 
+            = f.text_field :name 
+            = f.label :password, 'パスワード' 
+            = f.password_field :password
+            = f.label :password_confirmation, 'パスワード（確認のため再度ご入力願います）' 
+            = f.password_field :password_confirmation
+            = f.submit 'ユーザ登録'
+          end
+          div#questioncreate.algin1.fsize14　ログイン画面を表示

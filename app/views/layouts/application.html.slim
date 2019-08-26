@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title = yield :title 
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+
+    script type = 'text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'
+    script type = 'text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'
+    script type = 'text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js'
+    script type = 'text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.3.2/fabric.js'
+    script type = 'text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/Modaal/0.4.4/js/modaal.js'
+    script type = 'text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js'
+    script type = 'text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.4.0/perfect-scrollbar.js'
+    link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css'
+    link rel='stylesheet' type='text/css' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'
+    link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/Modaal/0.4.4/css/modaal.css'
+    link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.4.0/css/perfect-scrollbar.min.css'
+    = javascript_include_tag 'html2canvas.js'
+    body
+    = yield

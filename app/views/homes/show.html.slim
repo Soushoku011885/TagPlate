@@ -1,0 +1,191 @@
+- content_for(:title, "TagPlate")
+div#app 
+  header#header
+  div#leftside
+    nav#leftsidenavi
+      div#leftsidenavi-wrapper
+        a#aAllPlates class='active' title='プレート'
+          = image_tag 'AllPlates.png',   :size => "40x40"
+          = image_tag 'AllPlatesWH.png', :size => "40x40" 
+        a#aAddPlates title='プレート追加'
+          = image_tag 'AddPlates.png',   :size => "40x40"
+          = image_tag 'AddPlatesWH.png', :size => "40x40"
+        a#aEditGroup title='グループ追加'
+          = image_tag 'Group.png',       :size => "40x40"
+          = image_tag 'GroupWH.png',     :size => "40x40"
+        a#aText title='テキスト挿入'
+          = image_tag 'Text.png',        :size => "40x40"
+          = image_tag 'TextWH.png',      :size => "40x40"
+        a#aShape title='図形挿入'
+          = image_tag 'Shape.png',       :size => "40x40"
+          = image_tag 'ShapeWH.png',     :size => "40x40"
+        a#aEditTags title='フリーライン'
+          = image_tag 'FreeLine.png',    :size => "40x40"
+          = image_tag 'FreeLineWH.png',  :size => "40x40"
+    div#toolbar 
+      div#AllPlates.tabcontents
+        p.platescount = @count
+        div#content-wrapper  
+          -@tables.each do |table|
+            div.content-detail.whitebkcol03 title='右方向へドラッグ＆ドロップ' data=  {:update    => table.updated_at.in_time_zone('Tokyo'),
+                                                                                    :create     => table.created_at.in_time_zone('Tokyo'),
+                                                                                    :groupname  => table.group.name,}
+              div.front.fsize13 draggable="true" = table.text         
+              nav.updateddate = table.updated_at.in_time_zone('Tokyo')
+              nav.groupname = table.group.name
+      div#AddPlates.tabcontents
+        div#edittop
+          = form_for(@table,url:homes_path, method: :post,remote: :true) do |f| 
+            p テキスト
+            = f.text_area :text,:placeholder=>'テキストを入力(140文字まで入力可能)',:maxlength=>'140'
+            p 関連付けるグループ 
+            = f.select :group_id, options_from_collection_for_select(Group.where(user_id: session[:user_id]),:id, :name) 
+            = f.submit '追加',:class=>'submit'
+          end
+      div#EditGroup.tabcontents
+          = form_for(@group,url:homes_path, method: :post,remote: :true) do |f| 
+            p グループ名
+            = f.text_field :name,:placeholder=>'グループ名を入力',:maxlength=>'20'
+            = f.submit '追加',:class=>'submit'
+          end
+      div#Text.tabcontents
+        div.texts.fsize16 draggable="true" style = 'font-family:"Meiryo";' テキストを入力（メイリオ）
+        div.texts.fsize16 draggable="true" style = 'font-family:"Meiryo UI";' テキストを入力（Meiryo UI）
+        div.texts.fsize16 draggable="true" style = 'font-family:"Yu Gothic";' テキストを入力（游ゴシック）
+        div.texts.fsize16 draggable="true" style = 'font-family:"Yu Mincho";' テキストを入力（游明朝体）
+        div.texts.fsize16 draggable="true" style = 'font-family:"Yu Gothic UI";' テキストを入力（Yu Gothic UI）
+        div.texts.fsize16 draggable="true" style = 'font-family:"ＭＳ ゴシック";' テキストを入力（ＭＳゴシック）
+        div.texts.fsize16 draggable="true" style = 'font-family:"ＭＳ Ｐゴシック";' テキストを入力（ＭＳ Ｐゴシック）
+        div.texts.fsize16 draggable="true" style = 'font-family:"MS UI Gothic";' テキストを入力（MS UI Gothic）
+        div.texts.fsize16 draggable="true" style = 'font-family:"ＭＳ 明朝";' テキストを入力（ＭＳ 明朝）
+        div.texts.fsize16 draggable="true" style = 'font-family:"ＭＳ Ｐ明朝";' テキストを入力（ＭＳ Ｐ明朝）
+
+      div#Shape.tabcontents
+        div#images
+          -for num in 1..90 do
+            div.imageshape
+              img src= "/assets/(#{num}).png" width = '40px'
+      div#FreeLine.tabcontents
+        p 製作中です。申し訳ありません。
+  div#main.whitebkcol03
+    div#mainlogo-wrapper
+      div#logo TagPlate
+    div#operation
+      div#operation-icons 
+        div#save-canvas 
+          = image_tag 'Save.png',  :size => "30x30" ,:id=>'practice'
+          p 保存
+        div#redo-canvas 
+          = image_tag 'Redo.png',  :size => "30x30"
+          p 元に戻す
+        div#undo-canvas 
+          = image_tag 'Undo.png',  :size => "30x30"
+          p やりなおす
+        div#align-elements 
+          = image_tag 'Align.png',  :size => "30x30"
+          p 整列       
+        div#copy-elements 
+          = image_tag 'Copy.png',  :size => "30x30"
+          p コピー
+        div#remove-elements 
+          = image_tag 'Remove.png',:size => "30x30"
+          p 削除
+      div#alignmenu style = 'display:none;'
+        ul
+          li#left.fsize20 左揃え
+          #alignleft   = image_tag 'alignleft.png',  :size => "30x30"
+          li#top.fsize20 上揃え
+          #aligntop    = image_tag 'aligntop.png',   :size => "30x30"
+          li#right.fsize20 右揃え
+          #alignright  = image_tag 'alignright.png', :size => "30x30"
+          li#bottom.fsize20 下揃え
+          #alignbottom = image_tag 'alignbottom.png',:size => "30x30"
+    canvas#thecanvas 
+  div#rightside
+    div#rightnavi
+      nav#rightsidenavi
+        div#rightsidenavi-wrapper
+          div#setting.modalsetting
+            = image_tag 'Setting.png',:size => "40x40", :title=>'設定'
+            p スタイル<br>設定
+          div#settingwindow style = 'display:none;'
+            div.fsize30 プレートスタイル設定
+            div#settingwrapper
+              div#fullscaleview
+                //クラス格納順[fontsize(0)、textalign(1)、lineheight(2)、fontstyle(3) 、width(4)、color(5)、background(6)]（7）
+                div#previewmodel class = @setting.classname  この文章はサンプルです。行間、フォントサイズ、フォントスタイルなどの変更が可能です。
+                div#attention.fsize12 ※最大幅を指定可能ですが、フォントサイズにより変動します。今後修正していきます。
+                div#slidebarwidth
+              div#fontcolor.fsize20 フォントカラー選択：
+              input#font type = 'color'
+              div#backgroundcolor.fsize20　バックカラー選択：
+              input#background type = 'color'
+              div#textcentering
+                p センタリング
+                div#slidebar1
+                div#slidebar1scale.fsize15 左　　　　　　　　　　　　中央　　　　　　　　　　　　右
+              div#lineheightselecting
+                p テキスト行間
+                div#slidebar2
+                div#slidebar2scale.fsize15 １　　　　１．５　　　　２　　　　 ２．５　　　　 ３
+              div#fontsizing
+                p フォントサイズ
+                div#slidebar3
+                div#slidebar3scale.fsize15 １　　　　　　　　　　　　　２　　　　　　　　　　　　　３
+              div#fontstyling
+                p フォントスタイル
+                div#slidebar4
+                div#slidebar4scale.fsize15 Ｎ　　　　　　　　Ｂ　　　　　　　　Ｉ　　　　　　　　Ｕ
+          div#help.modalhelp  
+            = image_tag 'Help.png',   :size => "40x40", :title=>'ヘルプ'
+            p ヘルプ
+          div#helpwindow style = 'display:none;'
+            div#helptitle.fsize30 TagPlate とは？
+            div.helptext.fsize20 140文字以内で自分だけのメモ書きを作成することができます。
+            div.helptext.fsize20 作成したメモは、中央のキャンバスへ付箋のように張り付けることが可能です。
+            div.helptext.fsize20 張り付けた付箋は編集することができます。
+            div.helptext.fsize20 キャンバスにて編集された内容は、そのまま保存することができます。
+            div.helptext.fsize20 次回ログイン時には、前回終了した状態から作業を再開することが可能です。
+            div.helptext.fsize20 キャンバスの現在の状態を、PDF形式で出力することができます。
+            div.helptext.fsize20 加えて、保存されているメモ書きはCSV形式で出力が可能です。
+            div.helptext.fsize20 いくつかの画像も用意しましたので、付箋とともに張り付けてみてください。
+          div#logout.modallogout
+            = image_tag 'Logout.png',  :size => "40x40", :title=>'ログイン'
+            p ログアウト
+          div#logoutwindow style = 'display:none;'
+            div#logouttitle.fsize30 ログアウト処理を行います。
+            div#questionsave.fsize20 ・・・の前に、キャンバス編集内容の保存はお済みでしょうか？
+            div#savetologout.fsize25 保存してからログアウト
+            div#dologout.fsize25 いますぐにログアウト
+          div#import 
+            = image_tag 'CSVImport.png',:size => "40x40", :title=>'CSVインポート'
+            p インポート
+          div#export 
+            = link_to '', new_home_path(format: :csv), id:'anchorexport'
+            = image_tag 'CSVExport.png',:size => "40x40", :title=>'CSVエクスポート'
+            p エクスポート
+          div#pdfexport 
+            = image_tag 'PDFExport.png',:size => "40x40", :title=>'PDFエクスポート'
+            p PDF出力 
+      div#platesinformation
+        p#texttitle.fsize15  テキスト
+        p#text.fsize15.whitebkcol03
+        p#grouptitle.fsize15  グループ
+        p#group.fsize15.whitebkcol03
+        p#updatedtitle.fsize15  更新日時
+        p#updated.fsize15.whitebkcol03
+        p#createdtitle.fsize15  作成日時
+        p#created.fsize15.whitebkcol03
+      div#tabnavi
+        p 当アプリケーションは、製作段階にあります。
+        p そのため、機能が不十分な箇所が多くあります。 
+        p キャンバス要素に表示される内容も未完全な状態です。
+        p 文字や画像が不鮮明な場合が、あると思います。
+        p その場合には、ページをリロードしていただくと
+        p 文字が鮮明に表示され、見やすくなります。
+        p ブラウザの拡大率は、100％でご使用いただくことを
+        p お勧めいたします。
+footer#footer
+  //作業用の要素をここに置いてます
+  div#canvasjson data= {:canvasjson => @object.canvasobjects_json}
+  canvas#work
