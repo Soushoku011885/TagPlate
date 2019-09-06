@@ -7,15 +7,12 @@ if (document.title == 'TagPlate'){
 };
 
 
-/************************************************************************/
-//　関数名　　TagPlate()
-//　処理内容　メイン画面のScript
-/************************************************************************/
+// ページタイトル「TagPlate」用のスクリプト
 function TagPlate(){
 
     //************************************************************************* */
-    //　ビジュアル関連の処理
-    //************************************************************************* */  
+    //　タブ制御　プレート登録関連　
+    //************************************************************************* */
     let toolbar = $('#toolbar');
     let tabcontent = $('#toolbar .tabcontents');
     let leftsidenaviwrapper = $('#leftsidenavi-wrapper a');
@@ -28,7 +25,7 @@ function TagPlate(){
     leftsidenaviwrapper.tooltip({
         show: 'slideDown',
         position: {
-            my:'left top',//tooltipの位置
+            my:'left top',   //tooltipの位置
             at:'left bottom',//基準位置
             collision: 'none'
         },
@@ -51,12 +48,14 @@ function TagPlate(){
     })
 
     //プレート登録時のアニメーション用（連続登録されることも考慮して300msくらいで）
+    //テキストが空欄で登録された時用の処理も欲しいね
     $('input[type=submit]').on('click',function(e){
         toolbar.effect('transfer',{to:$('#aAllPlates')},300,function(){
             $('#aAllPlates').effect('highlight',{color: 'rgb(80, 210, 210)'},300);
         });
     }) 
         
+    //プレート登録後　登録したプレートをＤＯＭ追加
     $(document).on('ajax:success', 'form', function(e){
         $('#content-wrapper').prepend(
         '<div class="content-detail whitebkcol03"' +
@@ -72,23 +71,23 @@ function TagPlate(){
         Addeddiv[0].addEventListener('dragstart',platedragstarat,false);
     })
 
+    //
     $('#plate_group_id').select2({
         width: '95%',
     });
 
     //************************************************************************* */
-    //　プレートのイベント制御、キャンバスのイベント制御　
+    //　プレート・テキスト・画像　イベント制御、キャンバスのイベント制御　
     //************************************************************************* */
-    //ドラッグ対象のdiv要素取得
     let plates = document.getElementsByClassName('content-detail');
     let texts  = document.getElementsByClassName('texts');
     let images = document.getElementsByClassName('imageshape');
     
-    let data    ='';    //DIVかどうかの判定、情報の保持
-    let textdata='';    //テキストかどうかの判定
-    let image   ='';    //画像かどうかの判定
-    let divlayerX;
-    let divlayerY;
+    let data    ='';    //プレート判定に使用、情報の保持
+    let textdata='';    //テキスト判定に使用
+    let image   ='';    //画像判定に使用
+    let divlayerX;      //Ｘ座標の保持
+    let divlayerY;      //Ｙ座標の保持
 
     //プレート***************************************************************************
     for ( let i = 0 ; i < plates.length ; i++ ){
@@ -110,8 +109,8 @@ function TagPlate(){
         data = '';
         image= '';
         textdata = event.target;
-        divlayerX = event.layerX;
-        divlayerY = event.layerY;
+        divlayerX = event.offsetX;
+        divlayerY = event.offsetY;
     }
 
     //画像++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -123,18 +122,20 @@ function TagPlate(){
         data    = '';
         textdata= '';
         image = event.target;
-        divlayerX = event.layerX;
-        divlayerY = event.layerY;
+        divlayerX = event.offsetX;
+        divlayerY = event.offsetY;
     }
 
     let state;
     let undo = [];
     let redo = [];
-    //キャンバス作成
+
+    //キャンバス生成！！　
     let canvas = new fabric.Canvas('thecanvas',{backgroundColor:'white'});
 
     window.addEventListener('resize',canvas_resize,false);
-
+    
+    //常にキャンバスを縦横100％表示にしたい
     function canvas_resize(e){
         let w = $('.canvas-container')[0].clientWidth;
         let h = $('.canvas-container')[0].clientHeight;
@@ -143,23 +144,24 @@ function TagPlate(){
 
     }
     canvas_resize();
+    //jsonで保存時に必要最低限の情報のみを提供（データ削減のため）
     canvas.includeDefaultValues = false;
 
+    //キャンバス内で何かしらの変化があった
+    canvas.on('object:modified', function(e) {
+        save();
+    });
 
-
-    //Undo Redo処理*******************************************************************************
+    //Undo・Redo処理*******************************************************************************
     function save() {
         redo = [];
         if (state) {
             undo.push(state);
         }
+        //Jsonとして保持します
         state = JSON.stringify(canvas);
     }
-
-    canvas.on('object:modified', function(e) {
-        save();
-    });
-
+    //保持していたJson情報をキャンバスへ表示
     function replay(playStack, saveStack) {
         saveStack.push(state);
         state = playStack.pop();
@@ -180,9 +182,8 @@ function TagPlate(){
         }
     });
 
-    //表示処理*************************************************************************************
-
-    let canvasjson = $('#canvasjson').data('canvasjson'); //キャンバス情報格納してました
+    //表示処理（ログイン直後＆リロード時）************************************************************
+    let canvasjson = $('#canvasjson').data('canvasjson'); //とりあえず←にJSON読み込んであるので
     canvas.loadFromJSON(canvasjson, function() {
         canvas.renderAll(); 
         save();
@@ -206,9 +207,8 @@ function TagPlate(){
             alert('保存完了')
         })
     }
-    //*************************************************/
-    //整列イベント
-    //*************************************************/
+
+    //整列ボタン表示処理****************************************************************************
     let alignmenu = $('#alignmenu')[0];
     $('#align-elements').on('click',function(e){
         let elmtarget = e.originalEvent.target;
@@ -230,28 +230,104 @@ function TagPlate(){
         };
     });
 
-    //*************************************************/
-    //　キャンバスのイベント
-    //*************************************************/
-    $('#zoomIn').click(function(){
-        canvas.setZoom(canvas.getZoom() * 1.1 ) ;
-        if (canvas.getZoom() == 1){
-            alert('100%')
-        }
-    }) ;
+    //整列処理*************************************************************************************
+    $('#left').on('click',setAlign);
+    $('#right').on('click',setAlign);
+    $('#top').on('click',setAlign);
+    $('#bottom').on('click',setAlign);
+    $('#center').on('click',setAlign);
     
-    $('#zoomOut').click(function(){
-        canvas.setZoom(canvas.getZoom() / 1.1 ) ;
-        if (canvas.getZoom() == 1){
-            alert('100%')
+    function setAlign(e) {
+        
+        let selectobj = canvas.getActiveObject();
+        if (!selectobj){
+            alignmenu.style.display = 'none';
+        }else{
+    
+            let align = e.target.id;       
+            let top = canvas.getActiveObject().height / 2;　//このラインがtopの基準っぽい
+            let left = canvas.getActiveObject().width / 2;　//このラインがleftの基準っぽい
+    
+            switch (align) {
+            case 'top':
+                selectobj._objects.forEach(function(obj){
+                    obj.top = -top;
+                })
+                break
+            case 'left':
+                selectobj._objects.forEach(function(obj){
+                    obj.left = -left;
+                })            
+                break
+            case 'bottom':
+                selectobj._objects.forEach(function(obj){
+                    obj.top = top - obj.height;
+                })
+                break
+            case 'right':
+                selectobj._objects.forEach(function(obj){
+                    obj.left = left - obj.width;
+                })
+                break
+            }
+            alignmenu.style.display = 'none';
+            save();
+            //これやらないと文字がぼやける気がする
+            selectobj.setCoords();
+            canvas.renderAll();
         }
-    }) ;
+    }
 
-//*********************************************************************************** */
+    //複製処理*************************************************************************************
+    $('#copy-elements').on('click',function(){
+    
+        canvas.getActiveObject().clone(function(clonedObj) {
+            // 選択フォーカスを非表示に（残るので。。。）
+            canvas.discardActiveObject();
+            clonedObj.set({
+                left: clonedObj.left + 10, //ちょっとずらして表示
+                top: clonedObj.top   + 10, //ちょっとずらして表示
+                evented: true,
+            });
+            //複数選択された場合
+            if (clonedObj.type === 'activeSelection') {
+                clonedObj.canvas = canvas;
+                clonedObj.forEachObject(function(obj) {
+                    canvas.add(obj);
+                });
+                clonedObj.setCoords();
+            } else {
+            //１つのみ選択された場合
+                canvas.add(clonedObj);
+            }
+            canvas.setActiveObject(clonedObj);
+            canvas.requestRenderAll();
+            save();
+        });
+    })
+    
+    //削除処理*************************************************************************************
+    $('#remove-elements').on('click',function(){
+    
+        let removeObj = canvas.getActiveObject();   
+        //複数選択された場合
+        if (removeObj.type === 'activeSelection') {
+            removeObj.forEachObject(function(obj) {
+                canvas.remove(obj);
+            });
+        } else {
+            //１つのみ選択された場合
+            canvas.remove(removeObj);
+        }
+        // 選択フォーカスを非表示に（残るので。。。）
+        canvas.discardActiveObject();
+        save();
+    })
+    //文字列改行処理（改良の余地あり）
     function wrapText (context, text5, maxWidth) {
 
         let string = '';
-        var words = text5.split(' '),
+        let words = text5.split(' '),
             line = '',
             i,
             test,
@@ -261,7 +337,6 @@ function TagPlate(){
             test = words[i];
             metrics = context.measureText(test);
             while (metrics.width > maxWidth) {
-                // Determine how much of the word will fit
                 test = test.substring(0, test.length - 1);
                 metrics = context.measureText(test);
             }
@@ -313,7 +388,7 @@ function TagPlate(){
         
         if (data != ''){
             let str = data.children[0].textContent;
-            // //　プレート配置
+            // プレート配置
             
             bold      = 'normal';
             italic    = 'noraml';
@@ -328,9 +403,9 @@ function TagPlate(){
                 top            : toppos,
                 fill           : fontcolor,
                 fontWeight     : bold,
-                // fontStyle      : italic,
+                // fontStyle      : italic,//現状こちらを有効にした場合スタイルが崩れる（要対応）
                 underline      : underline,
-                fontFamily     : 'Meiryo UI',
+                fontFamily     : 'Meiryo UI',//フォントは選択肢増やせ
                 fontSize       : fontsize,
                 lineHeight     : lineheight,
                 backgroundColor: backcolor,
@@ -364,114 +439,20 @@ function TagPlate(){
         save();
     });
 
-    //　整列処理*************************************************************************************
-    $('#left').on('click',setAlign);
-    $('#right').on('click',setAlign);
-    $('#top').on('click',setAlign);
-    $('#bottom').on('click',setAlign);
-    $('#center').on('click',setAlign);
-    
-    function setAlign(e) {
-        
-        let selectobj = canvas.getActiveObject();
-        if (selectobj == undefined){
-            alignmenu.style.display = 'none';
-        }else{
 
-            let align = e.target.id;       
-            let top = canvas.getActiveObject().height / 2;　//このラインがtopの基準っぽい
-            let left = canvas.getActiveObject().width / 2;　//このラインがleftの基準っぽい
-    
-            switch (align) {
-            case 'top':
-                selectobj._objects.forEach(function(obj){
-                    obj.top = -top;
-                })
-                break
-            case 'left':
-                selectobj._objects.forEach(function(obj){
-                    obj.left = -left;
-                })            
-                break
-            case 'bottom':
-                selectobj._objects.forEach(function(obj){
-                    obj.top = top - obj.height;
-                })
-                break
-            case 'right':
-                selectobj._objects.forEach(function(obj){
-                    obj.left = left - obj.width;
-                })
-                break
-            }
-            alignmenu.style.display = 'none';
-            save();
-            //これやらないと文字がぼやける気がする
-            selectobj.setCoords();
-            canvas.renderAll();
-        }
-    }
-
-    //　複製処理*************************************************************************************
-    $('#copy-elements').on('click',function(){
-
-        canvas.getActiveObject().clone(function(clonedObj) {
-            // 選択フォーカスを非表示に（残るので。。。）
-            canvas.discardActiveObject();
-            clonedObj.set({
-                left: clonedObj.left + 10, //ちょっとずらして表示
-                top: clonedObj.top   + 10, //ちょっとずらして表示
-                evented: true,
-            });
-            //複数選択された場合
-            if (clonedObj.type === 'activeSelection') {
-                clonedObj.canvas = canvas;
-                clonedObj.forEachObject(function(obj) {
-                    canvas.add(obj);
-                });
-                clonedObj.setCoords();
-            } else {
-            //１つのみ選択された場合
-                canvas.add(clonedObj);
-            }
-            canvas.setActiveObject(clonedObj);
-            canvas.requestRenderAll();
-            save();
-        });
-    })
-
-    //　削除処理*************************************************************************************
-    $('#remove-elements').on('click',function(){
-
-        let removeObj = canvas.getActiveObject();   
-        //複数選択された場合
-        if (removeObj.type === 'activeSelection') {
-            removeObj.forEachObject(function(obj) {
-                canvas.remove(obj);
-            });
-        } else {
-            //１つのみ選択された場合
-            canvas.remove(removeObj);
-        }
-        // 選択フォーカスを非表示に（残るので。。。）
-        canvas.discardActiveObject();
-        save();
-    })
-    
-    //*************************************************/
-    //　オブジェクトのイベント
-    //*************************************************/
+    // プレートホバー時の詳細情報表示
     let text    = $('#text');
     let group   = $('#group');
     let updated = $('#updated');
     let created = $('#created');
 
     canvas.on('mouse:over', function (evt) {
-        // プレートホバー時の詳細情報表示
-        text.text(evt.target.text);
-        group.text(evt.target.styles.gname);
-        updated.text(evt.target.styles.update);
-        created.text(evt.target.styles.create);
+        if (evt.target != null && evt.target.styles){
+            text.text(evt.target.text);
+            group.text(evt.target.styles.gname    ? evt.target.styles.gname : '');
+            updated.text(evt.target.styles.update ? evt.target.styles.update: '');
+            created.text(evt.target.styles.create ? evt.target.styles.create: '');
+        }
     });
 
     // CSV入力
@@ -485,7 +466,7 @@ function TagPlate(){
         aexport[0].click();
     })
 
-    // PDF出力
+    // PDF出力（サイズがおかしい）
     $('#pdfexport').on('click', function () {
         html2canvas(document.getElementById("thecanvas")).then(function(canvas){
             let dataURI = canvas.toDataURL('image/png');
@@ -495,7 +476,7 @@ function TagPlate(){
         });
     });
     
-    //　プレートレイアウト設定関連
+    //　プレートレイアウト設定（モーダル表示）
     let slidebar1 = $("#slidebar1");
     let slidebar2 = $("#slidebar2");
     let slidebar3 = $("#slidebar3");
@@ -621,12 +602,14 @@ function TagPlate(){
         previewmodel[0].style.background = e.target.value;
     });
 
+　　//　TagPlateについて説明（モーダル表示）
     $('.modalhelp').modaal({
         type: 'inline',
         background: 'rgb(80,210,210)',
         content_source: '#helpwindow'
     });
-    
+
+    //　ログアウト画面（モーダル表示）
     $('.modallogout').modaal({
         type: 'inline',
         background: 'rgb(80,210,210)',
@@ -654,8 +637,10 @@ function TagPlate(){
     }
 }
 
+
+// ページタイトル「TagPlate ログイン」用のスクリプト
+// ログイン画面・ユーザー登録画面のやつ
 function Login(){
-    // ログイン画面・ユーザー登録画面のやつ
     let inputlogin = document.getElementById('inputlogin');
     let inputcreate = document.getElementById('inputcreate');
     let opeclass = 'nonactive';

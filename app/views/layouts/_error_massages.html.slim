@@ -1,0 +1,5 @@
+-if @table.errors.any?
+  div#error_explanation
+    ul
+      -@table.errors.full_massages.each do |massage|
+        li = massage
