@@ -466,7 +466,8 @@ input{
 }
 
 
-.submit{
+.submit,
+#drawtoggle{
   width:95%;
   margin: 30px 5px;
   height: 30px;
@@ -476,7 +477,8 @@ input{
   color: rgb(88, 88, 88);
 }
 
-.submit:hover{
+.submit:hover,
+#drawtoggle:hover{
   background: rgb(80, 210, 210);
   cursor: pointer;
 }
@@ -494,6 +496,28 @@ input{
 .imageshape{
   display: inline-block;
   cursor: move;
+}
+
+#drawmenu{
+  width: 95%;
+  height: 500px;
+  background: white;
+  border: 2px dotted rgb(80, 210, 210);
+  margin: 0 auto;
+  display:none;
+}
+
+#drawmenu > p{
+  margin-top:20px;
+  margin-bottom: 10px;
+}
+
+#linecolor,
+#shadowcolor{
+  height: 40px;
+  padding: 0;
+  background:white;
+  border: 1px solid rgb(80,210,210);
 }
 
 #main{
@@ -599,6 +623,7 @@ border-left: 0.5px solid rgb(200, 200, 200);
   height: 90%;
   width: 100%;
   overflow: scroll;
+  background: white;
 }
 
 .canvas-container{
@@ -739,6 +764,10 @@ border-left: 0.5px solid rgb(200, 200, 200);
   border-top: solid 0.5px rgb(200, 200, 200);
   border-left: solid 0.5px rgb(200, 200, 200);
   background: rgb(255, 255, 255);
+}
+
+#tabnavi > p{
+  font-size: 1.5rem;
 }
 
 .ui-effects-transfer {

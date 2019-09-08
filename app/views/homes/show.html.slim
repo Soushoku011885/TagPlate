@@ -60,13 +60,30 @@ div#app
         div.texts.fsize16 draggable="true" style = 'font-family:"ＭＳ 明朝";' テキストを入力（ＭＳ 明朝）
         div.texts.fsize16 draggable="true" style = 'font-family:"ＭＳ Ｐ明朝";' テキストを入力（ＭＳ Ｐ明朝）
 
-      div#Shape.tabcontents
+      div#Shape.tabcontents style = 'overflow:scroll;'
         div#images
-          -for num in 1..90 do
+          -for num in 1..300 do
             div.imageshape
-              img src= "/assets/(#{num}).png" width = '40px'
+              img.lazyload data-src= "/assets/(#{num}).png" width = '40px' 
       div#FreeLine.tabcontents
-        p 製作中です。申し訳ありません。
+        input#drawtoggle type="button" value="お絵描きモードＯＮ"
+        div#drawmenu 
+          p 線の種類
+          select#drawmode 
+            option value="Pencil" ペンシル
+            option value="Circle" サークル
+            option value="Spray" スプレー
+            option value="Pattern" パターン
+          p 線の幅：0
+          input#linewidth type="range" value='0' min= '0' max='150'
+          p 線の色
+          input#linecolor type = 'color'
+          p 影の幅：0
+          input#lineshadow type="range" value='0' min= '0' max='50'
+          p 影のズレ幅：0
+          input#offsetshadow type="range" value='0' min= '0' max='50'          
+          p 影の色
+          input#shadowcolor type = 'color'          
   div#main.whitebkcol03
     div#mainlogo-wrapper
       div#logo TagPlate
@@ -177,14 +194,8 @@ div#app
         p#createdtitle.fsize15  作成日時
         p#created.fsize15.whitebkcol03
       div#tabnavi
-        p 当アプリケーションは、製作段階にあります。
-        p そのため、機能が不十分な箇所が多くあります。 
-        p キャンバス要素に表示される内容も未完全な状態です。
-        p 文字や画像が不鮮明な場合が、あると思います。
-        p その場合には、ページをリロードしていただくと
-        p 文字が鮮明に表示され、見やすくなります。
-        p ブラウザの拡大率は、100％でご使用いただくことを
-        p お勧めいたします。
+        p ＜☆お絵描きモードの注意点☆＞</br>お絵描きモードで描画した内容を、</br>大量にコピーすることはやめましょう。</br>メモリ不足が発生し、ブラウザがクラッシュしてしまいます。</br>当アプリ「TagPlate」の挙動もおかしくなりますので、大量コピーはやめましょう。
+        p ＜文字や画像が不鮮明になった＞</br>キャンバスを保存していただいた後に、</br>ページをリロードしていただくと、文字が鮮明に表示され、見やすくなります。</br>また、ブラウザの拡大率は、100％でご使用いただくことをお勧めいたします。
 footer#footer
   //作業用の要素をここに置いてます
   div#canvasjson data= {:canvasjson => @object.canvasobjects_json}

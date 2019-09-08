@@ -10,6 +10,9 @@ if (document.title == 'TagPlate'){
 // ページタイトル「TagPlate」用のスクリプト
 function TagPlate(){
 
+    //画像遅延読み込み
+    $("img.lazyload").lazyload();
+
     //************************************************************************* */
     //　タブ制御　プレート登録関連　
     //************************************************************************* */
@@ -71,7 +74,7 @@ function TagPlate(){
         Addeddiv[0].addEventListener('dragstart',platedragstarat,false);
     })
 
-    //
+    //グループ選択時の・・
     $('#plate_group_id').select2({
         width: '95%',
     });
@@ -133,6 +136,8 @@ function TagPlate(){
     //キャンバス生成！！　
     let canvas = new fabric.Canvas('thecanvas',{backgroundColor:'white'});
 
+    
+
     window.addEventListener('resize',canvas_resize,false);
     
     //常にキャンバスを縦横100％表示にしたい
@@ -140,7 +145,7 @@ function TagPlate(){
         let w = $('.canvas-container')[0].clientWidth;
         let h = $('.canvas-container')[0].clientHeight;
         canvas.setDimensions({width: w, height: h});
-        // canvas.renderAll();
+        canvas.renderAll();
 
     }
     canvas_resize();
@@ -380,7 +385,6 @@ function TagPlate(){
     let italic
     let underline
 
-
     // キャンバスへの何かしらの要素追加
     canvas.on('drop',function(e){
         let leftpos = e.e.layerX - divlayerX;
@@ -437,6 +441,86 @@ function TagPlate(){
                 canvas.add(texts)     
         }
         save();
+    });
+
+    //お絵描きモード設定関連
+    let drawtoggle   = $('#drawtoggle');
+    let drawmenu     = $('#drawmenu');
+    let drawmode     = $('#drawmode');
+    let linewidth    = $('#linewidth');
+    let linecolor    = $('#linecolor');
+    let lineshadow   = $('#lineshadow');
+    let offsetshadow = $('#offsetshadow');
+    let shadowcolor  = $('#shadowcolor');
+
+    //影の定義しないとだめ
+    canvas.freeDrawingBrush.shadow = new fabric.Shadow;
+
+    fabric.Object.prototype.transparentCorners = false;
+
+    drawtoggle.on('click',drawchange);
+
+    //お絵描き内容も履歴に
+    canvas.on('mouse:up',function(){
+        if (canvas.isDrawingMode){
+            save();
+        }
+    })
+
+    function drawchange() {
+        canvas.isDrawingMode = !canvas.isDrawingMode;
+        if (canvas.isDrawingMode) {
+            //お絵描きモードＯＮ状態
+            drawtoggle[0].value = 'お絵描きモードＯＦＦに';
+            drawtoggle[0].style.background = 'yellow';
+            drawmenu[0].style.display = 'block';
+        }
+        else {
+            //お絵描きモードＯＦＦ状態
+            drawtoggle[0].value = 'お絵描きモードＯＮに';
+            drawtoggle[0].style.background = 'rgb(241, 249, 255)';
+            drawmenu[0].style.display = 'none';
+        }
+    };
+
+    //「PencilBrush」・「CircleBrush」・「SprayBrush」・「PatternBrush」
+    //クラスを変えるごとに下記の再設定が必要
+    drawmode.on('change',function(e){
+        canvas.freeDrawingBrush = new fabric[e.target.value + 'Brush'](canvas);
+        canvas.freeDrawingBrush.color = linecolor[0].value;
+        canvas.freeDrawingBrush.width = parseInt(linewidth[0].value, 10) || 1;
+        canvas.freeDrawingBrush.shadow = new fabric.Shadow({
+            blur: parseInt(lineshadow[0].value, 10) || 0,
+            offsetX: offsetshadow[0].value,
+            offsetY: offsetshadow[0].value,
+            affectStroke: true,
+            color: shadowcolor[0].value,
+        });        
+    })
+
+    linecolor.on('change',function(e){
+        canvas.freeDrawingBrush.color = e.target.value;
+    })
+    linewidth.on('change',function(e){
+        canvas.freeDrawingBrush.width = parseInt(e.target.value,10) || 1;
+        e.target.previousSibling.innerHTML = '線の幅：' + e.target.value;
+    })
+    lineshadow.on('change',function(e){
+        canvas.freeDrawingBrush.shadow.blur = parseInt(e.target.value, 10) || 0;
+        e.target.previousSibling.innerHTML = '影の幅：' + e.target.value;
+    })
+    offsetshadow.on('change',function(e){
+        canvas.freeDrawingBrush.shadow.offsetX = parseInt(e.target.value, 10) || 0;
+        canvas.freeDrawingBrush.shadow.offsetY = parseInt(e.target.value, 10) || 0;
+        e.target.previousSibling.innerHTML = '影のズレ幅：' + e.target.value;
+    })
+    shadowcolor.on('change',function(e){
+        canvas.freeDrawingBrush.shadow.color = e.target.value;
+    })
+
+    //線の種類選択の・・
+    $('#drawmode').select2({
+        width: '95%',
     });
 
 
