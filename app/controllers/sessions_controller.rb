@@ -54,7 +54,8 @@ class SessionsController < ApplicationController
       redirect_to home_url(user)
     else
       # エラーメッセージを作成する
-      render 'new'
+      redirect_to :controller => 'users', :action => 'show',:message => 'ユーザ名もしくはパスワードが違います'
+      # render ('users/show')
     end
   end
 end

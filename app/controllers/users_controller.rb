@@ -8,8 +8,10 @@ class UsersController < ApplicationController
         @User = User.new(users_params)
         @User.login_count = 0
         if @User.save then
+            # ログインさせましょう
             render 'show'
         else    
+            # エラーメッセージ表示
             render 'show'
         end
     end
