@@ -50,64 +50,9 @@ ActiveRecord::Schema.define(version: 2019_07_15_081126) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "t_objects", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "t_plates", force: :cascade do |t|
-    t.integer "plates_userid"
-    t.integer "plates_id"
-    t.integer "plates_tabid"
-    t.text "plates_text"
-    t.text "plates_textback"
-    t.text "plates_font"
-    t.text "plates_fontcolor"
-    t.text "plates_fontsize"
-    t.text "plates_leftposition"
-    t.text "plates_toptposition"
-    t.text "plates_pencolor"
-    t.text "plates_penweight"
-    t.text "plates_radius1"
-    t.text "plates_radius2"
-    t.text "plates_radius3"
-    t.text "plates_radius4"
-    t.text "plates_currentside"
-    t.text "plates_width"
-    t.text "plates_height"
-    t.integer "plates_tagid"
-    t.integer "plates_groupid"
-    t.datetime "plates_registdate"
-  end
-
-  create_table "t_tags", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "t_users", force: :cascade do |t|
-    t.integer "user_id"
-    t.text "user_mail"
-    t.text "user_password"
-    t.datetime "user_registdate"
-    t.datetime "user_updatedate"
-    t.boolean "user_running"
-  end
-
   create_table "tabs", force: :cascade do |t|
     t.text "name"
     t.text "backcolor"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "tbl_plates", force: :cascade do |t|
-    t.integer "plt_userid"
-    t.integer "plt_id"
-    t.string "plt_text"
-    t.string "plt_textback"
-    t.integer "plt_tagid"
-    t.integer "plt_gruopid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
